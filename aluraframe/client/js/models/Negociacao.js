@@ -20,6 +20,7 @@ class Negociacao {
   get data() {
     //Estou retornando uma nova data passando a referencia da data que foi passada
     //Neste caso a pessoa não consegue usar os metodos da data.
+    //No caso eu estou criando uma copia da data
     return new Date(this._data.getTime());
   }
 
