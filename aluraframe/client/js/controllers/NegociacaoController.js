@@ -8,11 +8,18 @@ class NegociacaoController {
         this._inputQuantidade = $('#quantidade');
         this._inputValor = $('#valor');
         this._listaNegociacoes = new ListaNegociacoes();
+
+        //Intancio a claase de view passando o elemento do dom onde ficara a tabela
+        this._negociacoesView = new NegociacoesView($('#negociacoesView'));
+
+        //Chamo a funcao para reenderizar a tabela
+        this._negociacoesView.update(this._listaNegociacoes);
     }
 
     adicionaNegociacao(event) {
         event.preventDefault();
         this._listaNegociacoes.adiciona(this._criaNegociacao());
+        this._negociacoesView.update(this._listaNegociacoes);
         this._limpaFormulario();
 
         console.log(this._listaNegociacoes.negociacoes);
