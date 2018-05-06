@@ -14,12 +14,23 @@ class NegociacaoController {
 
         //Chamo a funcao para reenderizar a tabela
         this._negociacoesView.update(this._listaNegociacoes);
+
+        this._mensagem = new Mensagem();
+        this._mensagemView = new MensagemView($('#mensagemView'));
+
+        //Passando o modelo de negociacao para a classe de view
+        this._mensagemView.update(this._mensagem);
     }
 
     adicionaNegociacao(event) {
         event.preventDefault();
         this._listaNegociacoes.adiciona(this._criaNegociacao());
         this._negociacoesView.update(this._listaNegociacoes);
+
+        //Usando o metodo set para alterar a mensagem
+        this._mensagem.texto = 'Negociação adicionada com sucesso!';
+        //Chamando o metodo update para alterar o template
+        this._mensagemView.update(this._mensagem);
         this._limpaFormulario();
 
         console.log(this._listaNegociacoes.negociacoes);

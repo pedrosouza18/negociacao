@@ -1,12 +1,12 @@
-class NegociacoesView {
+class NegociacoesView extends View {
 
-    //Nesse constructor e passado o elemento do dom onde sera inserida a tabela
-    constructor(elemento) {
-        this._elemento = elemento;
+    //Crio o constructor chamando o super da classe pai
+    constructor(ele) {
+      super(ele);
     }
 
     //Essa e a funcao que criar o template dinamicamente
-    _template(lista) {
+    template(lista) {
         return `
         <table class="table table-hover table-bordered">
             <thead>
@@ -41,10 +41,5 @@ class NegociacoesView {
             </tfoot>
         </table>
         `;
-    }
-
-    //Funcao para reenderizar o template no html
-    update(lista) {
-        this._elemento.innerHTML = this._template(lista);
     }
 }
