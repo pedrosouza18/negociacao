@@ -7,33 +7,26 @@ class NegociacaoController {
         this._inputData = $('#data');
         this._inputQuantidade = $('#quantidade');
         this._inputValor = $('#valor');
-        this._listaNegociacoes = new ListaNegociacoes();
 
-        //Intancio a claase de view passando o elemento do dom onde ficara a tabela
-        this._negociacoesView = new NegociacoesView($('#negociacoesView'));
-
-        //Chamo a funcao para reenderizar a tabela
-        this._negociacoesView.update(this._listaNegociacoes);
-
-        this._mensagem = new Mensagem();
-        this._mensagemView = new MensagemView($('#mensagemView'));
-
-        //Passando o modelo de negociacao para a classe de view
-        this._mensagemView.update(this._mensagem);
+        //Guardando o this dessa classe
+        //let self = this;
+        //Criando uma instancia de Bind que recebe uma proxy pelo constructor
+        this._listaNegociacoes = new Bind(new ListaNegociacoes(), new NegociacoesView($('#negociacoesView')), 'adiciona', 'esvazia');
+       
+        this._mensagem = new Bind(new Mensagem(), new MensagemView($('#mensagemView')), 'texto');
     }
 
     adicionaNegociacao(event) {
         event.preventDefault();
         this._listaNegociacoes.adiciona(this._criaNegociacao());
-        this._negociacoesView.update(this._listaNegociacoes);
-
         //Usando o metodo set para alterar a mensagem
         this._mensagem.texto = 'Negociação adicionada com sucesso!';
-        //Chamando o metodo update para alterar o template
-        this._mensagemView.update(this._mensagem);
         this._limpaFormulario();
+    }
 
-        console.log(this._listaNegociacoes.negociacoes);
+    apagar() {
+        this._listaNegociacoes.esvazia();
+        this._mensagem.texto = 'Negociações apagadas com sucesso!';
     }
 
     //Metodos com undeline so podem ser acessiveis dentro da classe

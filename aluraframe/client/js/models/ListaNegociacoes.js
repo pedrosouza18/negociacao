@@ -12,4 +12,8 @@ class ListaNegociacoes {
         //Nesse caso para blindar a minha lista, eu retorno um array vazio concatenando com a minha lista real
         return [].concat(this._listaNegociacoes);
     }
+
+    esvazia() {
+        this._listaNegociacoes = [];
+    }
 }
