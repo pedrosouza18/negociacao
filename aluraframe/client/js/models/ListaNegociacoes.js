@@ -22,4 +22,14 @@ class ListaNegociacoes {
             return prev + item.volume;
         }, 0)
     }
+
+    //Metodo de ordenar a lista passando a funcao de ordenacao
+    ordena(criterio) {
+        this._listaNegociacoes.sort(criterio);        
+    }
+
+    //Metodo para desordenar
+    inverteOrdem() {
+        this._listaNegociacoes.reverse();
+    }
 }

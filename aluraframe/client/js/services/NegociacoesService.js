@@ -53,4 +53,15 @@ class NegociacoesService {
         })
         .catch(error => {throw new Error(error)});
     }
+
+    enviarNegociacao(negociacao) {
+        return new Promise((resolve, reject) => {
+
+            this._http.post('/negociacoes', negociacao)
+                .then(negociacoes => {
+                    resolve(negociacao);
+                })
+                .catch(error => reject('Não foi possível enviar a negociação!'));
+        });
+    }
 }
