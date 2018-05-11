@@ -1,28 +1,56 @@
 class NegociacoesService {
 
-    //cb e uma funcao de callback
-    obterNegociacoesDaSemana(cb) {
-        let xhr = new XMLHttpRequest();
+    constructor() {
+        this._http = new HttpService();
+    }
 
-        xhr.open('GET', 'negociacoes/semana');
+    //Criei varios metodos que retornam uma promise
+    obterNegociacoesDaSemana() {
 
-        //Em ajax toda requisicao passa por estados, esse e o metodo que fica escutando a mudança e executa algo
-        xhr.onreadystatechange = () => {
-            if(xhr.readyState == 4) {
-                if(xhr.status == 200) {
-                    // Pego a resposta e tranformo para obj JS
-                    //Chamo a funcao passando o primeiro parametro que e a mensagem como null caso tenha sucesso e passo a lista
-                    cb(null, JSON.parse(xhr.responseText)
-                        //Faço um map criando um novo array de negociacoes
-                        .map(obj => new Negociacao(new Date(obj.data), obj.quantidade, obj.valor)));
-                } else {
-                    //Caso de erro eu chamo a funcao passando a mensagem
-                    cb('Não foi possível importar as negociações!');
-                    console.log(xhr.responseText);
-                }
-            }
-        }
+        return new Promise((resolve, reject) => {
 
-        xhr.send();
+            this._http.get('negociacoes/semana')
+                .then(negociacoes => {
+                    resolve(negociacoes.map(obj => new Negociacao(new Date(obj.data), obj.quantidade, obj.valor)));
+                })
+                .catch(error => reject('Não foi possível importar as negociações!'));
+        });
+    }
+
+    obterNegociacoesDaSemanaAnterior() {
+
+        return new Promise((resolve, reject) => {
+
+            this._http.get('negociacoes/anterior')
+                .then(negociacoes => {
+                    resolve(negociacoes.map(obj => new Negociacao(new Date(obj.data), obj.quantidade, obj.valor)));
+                })
+                .catch(error => reject('Não foi possível importar as negociações da semana anterior!'));
+        });
+    }
+
+    obterNegociacoesDaSemanaRetrasada() {
+
+        return new Promise((resolve, reject) => {
+
+            this._http.get('negociacoes/retrasada')
+                .then(negociacoes => {
+                    resolve(negociacoes.map(obj => new Negociacao(new Date(obj.data), obj.quantidade, obj.valor)));
+                })
+                .catch(error => reject('Não foi possível importar as negociações da semana retrasada!'));
+        });
+    }
+
+    //Nesse metodo se obtem todas as promises
+    obterNegociacoes() {
+        return Promise.all([
+            this.obterNegociacoesDaSemana(),
+            this.obterNegociacoesDaSemanaAnterior(),
+            this.obterNegociacoesDaSemanaRetrasada()
+        ])
+        .then(periodos => {
+            return periodos.reduce((arrPrev, arr) => arrPrev.concat(arr), []);
+        })
+        .catch(error => {throw new Error(error)});
     }
 }
