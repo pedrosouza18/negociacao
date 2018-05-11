@@ -24,6 +24,26 @@ class NegociacaoController {
         this._limpaFormulario();
     }
 
+    importarNegociacoes() {
+        let service = new NegociacoesService();
+
+        //Instancio o service e chamo a funcao passando noutra funcao como parametro de callback
+        //Um e o erro e o outro a lista
+        service.obterNegociacoesDaSemana((error, negociacoes) => {
+
+            //Pelo principio de erro first, primeiro trata o erro e depois o sucesso
+            if(error) {
+                this._mensagem.texto = error;
+                //return para não executar mais nada
+                return;
+            }
+
+            //Percorro esse novo array e uso a funcao de adicionar
+            negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+            this._mensagem.texto = 'Negociações importadas com sucesso!';
+        })
+    }
+
     apagar() {
         this._listaNegociacoes.esvazia();
         this._mensagem.texto = 'Negociações apagadas com sucesso!';

@@ -35,11 +35,8 @@ class NegociacoesView extends View {
 
             <tfoot>
                 <td colspan="3" style="text-align: right;">Total:</td>
-                <td>${lista.negociacoes.reduce((prev, item) => {
-                    return prev + item.volume;
-                }, 0)}</td>
+                <td>${lista.volumeTotal}</td>
             </tfoot>
-        </table>
-        `;
+        </table>`;
     }
 }
