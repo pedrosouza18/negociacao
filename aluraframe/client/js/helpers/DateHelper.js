@@ -10,8 +10,9 @@ class DateHelper {
 
     static textForDate(text) {
         //Expressao regular para data, \d e que so aceita numeros
-        if(!/^\d{4}-\d{2}-\d{2}$/.test(text)) throw new Error('A data deve estar no formato yyyy-MM-dd!');
+        if(!/\d{2}\/\d{2}\/\d{4}/.test(text)) throw new Error('Deve estar no formato dd/mm/aaaa');
         
-        return new Date(...text.split('-').map((item, idx) => item - idx % 2));
+        //Usando o rever porque ele espera ano, mes e dia e não dia, mes e ano
+        return new Date(...text.split('/').reverse().map((item, idx) => item - idx % 2));
     }
 }

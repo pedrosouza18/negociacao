@@ -6,7 +6,7 @@ class View {
   }
 
   template() {
-    throw new Error('O método template precisa sercriado!');
+    throw new Error('O método template precisa ser criado!');
   }
 
   //Metodo para atualizar o dom

@@ -20,10 +20,15 @@ class NegociacaoController {
 
     adicionaNegociacao(event) {
         event.preventDefault();
-        this._listaNegociacoes.adiciona(this._criaNegociacao());
-        //Usando o metodo set para alterar a mensagem
-        this._mensagem.texto = 'Negociação adicionada com sucesso!';
-        this._limpaFormulario();
+
+        try {
+            this._listaNegociacoes.adiciona(this._criaNegociacao());
+            //Usando o metodo set para alterar a mensagem
+            this._mensagem.texto = 'Negociação adicionada com sucesso!';
+            this._limpaFormulario();
+        } catch(error) {
+            this._mensagem.texto = error;
+        }
 
         // let newNegociacao = this._criaNegociacao();
         // let negociacao = {
