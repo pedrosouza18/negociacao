@@ -26,7 +26,7 @@ class NegociacoesView extends View {
                                 <td>${DateHelper.dateForText(item.data)}</td>
                                 <td>${item.quantidade}</td>
                                 <td>${item.valor}</td>
-                                <td>${item.volume}</td>
+                                <td>${item.volume.toFixed(2)}</td>
                             </tr>
                         `;
                     })

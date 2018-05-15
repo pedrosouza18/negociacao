@@ -16,19 +16,34 @@ class NegociacaoController {
         this._listaNegociacoes = new Bind(new ListaNegociacoes(), new NegociacoesView($('#negociacoesView')), 'adiciona', 'esvazia', 'ordena', 'inverteOrdem');
        
         this._mensagem = new Bind(new Mensagem(), new MensagemView($('#mensagemView')), 'texto');
+    
+        ConnectionFactory
+            .getConnection()
+            // Nesse then retorn um dao
+            .then(connection => new NegociacaoDao(connection))
+            // Nesse chama o listaTodos do dao
+            .then(dao => dao.listaTodos())
+            .then(negociacoes => negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao)))
+            .catch(error => this._mensagem.texto = 'Não foi possível obter negociações');
     }
 
     adicionaNegociacao(event) {
         event.preventDefault();
 
-        try {
-            this._listaNegociacoes.adiciona(this._criaNegociacao());
-            //Usando o metodo set para alterar a mensagem
-            this._mensagem.texto = 'Negociação adicionada com sucesso!';
-            this._limpaFormulario();
-        } catch(error) {
-            this._mensagem.texto = error;
-        }
+        // Crio uma conexão com o indexedDb
+        ConnectionFactory
+            .getConnection()
+            .then(connection => {
+                new NegociacaoDao(connection)
+                    .adiciona(this._criaNegociacao())
+                    .then(() => {
+                        this._mensagem.texto = 'Negociação adicionada com sucesso!';
+                        this._listaNegociacoes.adiciona(this._criaNegociacao());
+                        //Usando o metodo set para alterar a mensagem
+                        this._limpaFormulario();
+                    });
+            })
+            .catch(error => this._mensagem.texto = error);
 
         // let newNegociacao = this._criaNegociacao();
         // let negociacao = {
@@ -54,8 +69,15 @@ class NegociacaoController {
     }
 
     apagar() {
-        this._listaNegociacoes.esvazia();
-        this._mensagem.texto = 'Negociações apagadas com sucesso!';
+        ConnectionFactory
+            .getConnection()
+            .then(connection => new NegociacaoDao(connection))
+            .then(dao => dao.apagarTodas())
+            .then(mensagem => {
+                this._mensagem.texto = mensagem;
+                this._listaNegociacoes.esvazia();
+            })
+            .catch(error => this._mensagem.texto = error);
     }
 
     //Metodos com undeline so podem ser acessiveis dentro da classe
@@ -67,8 +89,8 @@ class NegociacaoController {
         //Os ... são chamados de spread operator, eles desmembram um array
         return new Negociacao(
             DateHelper.textForDate(this._inputData.value),
-            this._inputQuantidade.value,
-            this._inputValor.value
+            parseInt(this._inputQuantidade.value),
+            parseFloat(this._inputValor.value)
         );
     }
 
