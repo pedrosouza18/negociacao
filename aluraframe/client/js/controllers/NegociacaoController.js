@@ -62,6 +62,17 @@ class NegociacaoController {
         let service = new NegociacoesService();
         service.obterNegociacoes()
             .then(negociacoes => {
+                // Tive que usar some pois o filter so aceita valores booleanos
+                return negociacoes.filter(negociacao => {
+                    // Metodo some recebe uma condição e retorna true ou false
+                    // Ele percorre o array e ver se tal condição esta como true, se estiver ele para na hora
+                    return !this._listaNegociacoes.negociacoes.some(negociacaoExistente => {
+                        // Se consegue comparar objetos os transformando em string, com o JSON.stringfy
+                        return JSON.stringify(negociacao) == JSON.stringify(negociacaoExistente);
+                    })
+                })
+            })
+            .then(negociacoes => {
                 negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
                 this._mensagem.texto = 'Negociações importadas com sucesso!';
             })
