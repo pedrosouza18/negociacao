@@ -16,32 +16,35 @@ class NegociacaoController {
         this._listaNegociacoes = new Bind(new ListaNegociacoes(), new NegociacoesView($('#negociacoesView')), 'adiciona', 'esvazia', 'ordena', 'inverteOrdem');
        
         this._mensagem = new Bind(new Mensagem(), new MensagemView($('#mensagemView')), 'texto');
+        
+        this._service = new NegociacoesService();
+        // Coloquei os metodos que não tem a ver com os atributor no init
+        this._init();
+    }
     
-        ConnectionFactory
-            .getConnection()
-            // Nesse then retorn um dao
-            .then(connection => new NegociacaoDao(connection))
-            // Nesse chama o listaTodos do dao
-            .then(dao => dao.listaTodos())
-            .then(negociacoes => negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao)))
-            .catch(error => this._mensagem.texto = 'Não foi possível obter negociações');
+    _init() {
+
+        this._service
+            .lista()
+            .then(negociacoes => {
+                negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+            })
+            .catch(error => this._mensagem.texto = error);
+    
+        setInterval(() => {
+            this.importarNegociacoes();
+        }, 3000);
     }
 
     adicionaNegociacao(event) {
         event.preventDefault();
 
-        // Crio uma conexão com o indexedDb
-        ConnectionFactory
-            .getConnection()
-            .then(connection => {
-                new NegociacaoDao(connection)
-                    .adiciona(this._criaNegociacao())
-                    .then(() => {
-                        this._mensagem.texto = 'Negociação adicionada com sucesso!';
-                        this._listaNegociacoes.adiciona(this._criaNegociacao());
-                        //Usando o metodo set para alterar a mensagem
-                        this._limpaFormulario();
-                    });
+        this._service
+            .cadastra(this._criaNegociacao())
+            .then(mensagem => {
+                this._listaNegociacoes.adiciona(this._criaNegociacao());
+                this._mensagem.texto = mensagem;
+                this._limpaFormulario();
             })
             .catch(error => this._mensagem.texto = error);
 
@@ -59,19 +62,8 @@ class NegociacaoController {
 
 
     importarNegociacoes() {
-        let service = new NegociacoesService();
-        service.obterNegociacoes()
-            .then(negociacoes => {
-                // Tive que usar some pois o filter so aceita valores booleanos
-                return negociacoes.filter(negociacao => {
-                    // Metodo some recebe uma condição e retorna true ou false
-                    // Ele percorre o array e ver se tal condição esta como true, se estiver ele para na hora
-                    return !this._listaNegociacoes.negociacoes.some(negociacaoExistente => {
-                        // Se consegue comparar objetos os transformando em string, com o JSON.stringfy
-                        return JSON.stringify(negociacao) == JSON.stringify(negociacaoExistente);
-                    })
-                })
-            })
+        this._service
+            .importa(this._listaNegociacoes.negociacoes)
             .then(negociacoes => {
                 negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
                 this._mensagem.texto = 'Negociações importadas com sucesso!';
@@ -80,15 +72,12 @@ class NegociacaoController {
     }
 
     apagar() {
-        ConnectionFactory
-            .getConnection()
-            .then(connection => new NegociacaoDao(connection))
-            .then(dao => dao.apagarTodas())
+        this._service
+            .apaga()
             .then(mensagem => {
-                this._mensagem.texto = mensagem;
                 this._listaNegociacoes.esvazia();
+                this._mensagem.texto = mensagem;
             })
-            .catch(error => this._mensagem.texto = error);
     }
 
     //Metodos com undeline so podem ser acessiveis dentro da classe
